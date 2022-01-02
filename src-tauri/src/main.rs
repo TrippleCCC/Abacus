@@ -29,20 +29,10 @@ fn eval(expression: String, state: tauri::State<ProtectedAbacusState>) -> Result
 
     match result {
         Ok(r) => Ok(match r {
-            Some(num) => {
-                let ret = num.to_string_pretty();
-                println!("{}", ret);
-                ret
-            }
-            None => {
-                println!("NOTHING");
-                String::default()
-            }
+            Some(num) => num.to_string_pretty(),
+            None => String::default(),
         }),
-        Err(err) => {
-            println!("{}", err.to_string());
-            Err(err.to_string())
-        }
+        Err(err) => Err(err.to_string()),
     }
 }
 
