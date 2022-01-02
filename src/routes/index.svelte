@@ -1,27 +1,36 @@
 <script lang="ts">
-    import {beforeUpdate, afterUpdate} from 'svelte';
+    import { afterUpdate } from 'svelte';
+    import { invoke } from '@tauri-apps/api/tauri';
+
+    interface HistoryItem {
+        expression: string;
+        result: string;
+    }
     
-    let history: string[] = [];
+    let history: HistoryItem[] = [];
 
     let current_string: string = "";
 
     let history_reference: HTMLElement;
 
-    let auto_scroll: boolean;
-
-    beforeUpdate(() => {
-        auto_scroll = history_reference && 
-            (history_reference.offsetHeight + history_reference.scrollTop) > (history_reference.scrollHeight - 20);
-    });
-
     afterUpdate(() => {
-        if (auto_scroll) history_reference.scrollTo(0, history_reference.scrollHeight);
+        history_reference.scrollTo(0, history_reference.scrollHeight);
     });
 
-    function addToHistory() {
+    async function addToHistory() {
+        var result: string;
+
+        try {
+            result = await invoke('eval', { expression: current_string });
+            console.log(result);
+        } catch (err) {
+            result = err;
+            console.log(err);
+        }
+
         history = [
             ...history,
-            current_string
+            { expression: current_string, result }
         ];
 
         current_string = "";
@@ -37,16 +46,22 @@
 <div class="screen">
     <div bind:this={history_reference} class="history-container">
         {#each history as item}
-            <p>{item}</p>
+            <div>
+                <p>{item.expression}</p>
+                <p>{item.result}</p>
+            </div>
         {/each}
     </div>
     <input class="expression-input" type="text" bind:value={current_string} on:keypress={onKeyPress} />
 </div>
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
     :global(body) {
         height: 100%;
         margin: 0;
+        font-family: 'Roboto Mono', monospace;
     }
 
     :global(body #svelte) {
@@ -74,9 +89,12 @@
         overflow: auto;
     }
 
-    
+    .history-container p {
+        font-size: 40px;
+    }
 
     .expression-input {
         height: 50px;
+        font-size: 40px;
     }
 </style>
