@@ -5,7 +5,7 @@
 
 <div class="container">
     <div class="expression"><span class="arrow">&gt</span> {expression}</div>
-    <div class="result">{result}</div>
+    <div class="result"><pre>{result}</pre></div>
 </div>
 
 <style>
@@ -21,6 +21,11 @@
     .result {
         font-size: 1.5rem;
         color: #2AC327;
+    }
+
+    .result pre {
+        margin: 0;
+        padding: 0;
     }
 
     .container {
