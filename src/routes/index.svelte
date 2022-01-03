@@ -97,8 +97,7 @@
     }
 
     .expression-input {
-        -webkit-appearance: none;
-        outline: none;
+        all: unset;
         font-family: 'Roboto Mono', monospace;
 
         height: 50px;
