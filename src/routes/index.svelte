@@ -2,18 +2,15 @@
     import { afterUpdate, onMount } from 'svelte';
     import { invoke } from '@tauri-apps/api/tauri';
     import HistoryItem from '$lib/HistoryItem.svelte';
-
-    interface HistoryItem {
-        expression: string;
-        result: string;
-    }
-    
-    let history: HistoryItem[] = [];
+    import { GetPrevExpression, history_store, AddToHistory } from '$lib/HistoryStore';
 
     let current_string: string = "";
+    let saved_string: string;
 
     let history_reference: HTMLElement;
     let input_reference: HTMLInputElement;
+
+    let history_counter: number = 0;
 
     onMount(() => {
         input_reference.focus();
@@ -38,10 +35,7 @@
             result = " ";
         }
 
-        history = [
-            ...history,
-            { expression: current_string, result }
-        ];
+        AddToHistory(current_string, result);
 
         current_string = "";
     }
@@ -49,13 +43,39 @@
     function onKeyPress(e: KeyboardEvent) {
         if (e.key === "Enter") {
             addToHistory();
+        } else if (e.key === "ArrowUp" || e.key === "Up") {
+            console.log("HELLO");
+            if (history_counter == 0)
+                saved_string = current_string;
+
+            history_counter++;
+
+            let history_item = GetPrevExpression(history_counter);
+            if (history_counter !== null) {
+                current_string = history_item;
+            } else {
+                history_counter--;
+            }
+        } else if (e.key === "ArrowDown" || e.key === "Down") {
+            if (history_counter == 0) {
+                return;
+            }
+
+            history_counter -= 1;
+
+            if (history_counter == 0) {
+                // Set the current_string to the saved string
+                current_string = saved_string;
+            } else {
+                current_string = GetPrevExpression(history_counter);
+            }
         }
     }
 </script>
 
 <div class="screen">
     <div bind:this={history_reference} class="history-container">
-        {#each history as item}
+        {#each $history_store as item}
             <HistoryItem {...item} />
         {/each}
     </div>
