@@ -1,12 +1,12 @@
 {
   "package": {
-    "productName": "abacus",
+    "productName": "Abacus",
     "version": "0.1.0"
   },
   "build": {
     "distDir": "../build",
     "devPath": "http://localhost:3000",
-    "beforeDevCommand": "npx svelte-kit  dev",
+    "beforeDevCommand": "npx svelte-kit dev",
     "beforeBuildCommand": "npx svelte-kit build"
   },
   "tauri": {
@@ -53,7 +53,7 @@
     },
     "windows": [
       {
-        "title": "abacus",
+        "title": "Abacus",
         "width": 800,
         "height": 600,
         "resizable": true,
