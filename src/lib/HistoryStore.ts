@@ -17,7 +17,7 @@ function GetPrevExpression(index: number): null | string {
         return null;
     }
 
-    return history.at(-index).expression;
+    return history[history.length - index].expression;
 }
 
 export { AddToHistory, GetPrevExpression, history_store };

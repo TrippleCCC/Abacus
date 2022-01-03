@@ -25,10 +25,10 @@
 
         try {
             result = await invoke('eval', { expression: current_string });
-            console.log(result);
+            // console.log(result);
         } catch (err) {
             result = err;
-            console.log(err);
+            // console.log(err);
         }
 
         if (result === "") {
@@ -41,34 +41,40 @@
     }
 
     function onKeyPress(e: KeyboardEvent) {
-        if (e.key === "Enter") {
+        if (e.key === "Enter")
             addToHistory();
-        } else if (e.key === "ArrowUp" || e.key === "Up") {
-            console.log("HELLO");
-            if (history_counter == 0)
-                saved_string = current_string;
+        else if (e.key === "ArrowUp" || e.key === "Up")
+            onKeyUp();
+        else if (e.key === "ArrowDown" || e.key === "Down")
+            onKeyDown();
+    }
 
-            history_counter++;
+    function onKeyUp() {
+        if (history_counter == 0)
+            saved_string = current_string;
 
-            let history_item = GetPrevExpression(history_counter);
-            if (history_counter !== null) {
-                current_string = history_item;
-            } else {
-                history_counter--;
-            }
-        } else if (e.key === "ArrowDown" || e.key === "Down") {
-            if (history_counter == 0) {
-                return;
-            }
+        history_counter = history_counter + 1;
 
-            history_counter -= 1;
+        let history_item = GetPrevExpression(history_counter);
+        if (history_item == null) {
+            history_counter = history_counter - 1;
+        } else {
+            current_string = history_item;
+        }
+    }
 
-            if (history_counter == 0) {
-                // Set the current_string to the saved string
-                current_string = saved_string;
-            } else {
-                current_string = GetPrevExpression(history_counter);
-            }
+    function onKeyDown() {
+        if (history_counter == 0) {
+            return;
+        }
+
+        history_counter -= 1;
+
+        if (history_counter == 0) {
+            // Set the current_string to the saved string
+            current_string = saved_string;
+        } else {
+            current_string = GetPrevExpression(history_counter);
         }
     }
 </script>
@@ -79,7 +85,7 @@
             <HistoryItem {...item} />
         {/each}
     </div>
-    <input class="expression-input" type="text" bind:this={input_reference} bind:value={current_string} on:keypress={onKeyPress} />
+    <input class="expression-input" type="text" bind:this={input_reference} bind:value={current_string} on:keyup={onKeyPress} />
 </div>
 
 <style>
