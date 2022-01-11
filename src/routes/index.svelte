@@ -10,6 +10,8 @@
     let history_reference: HTMLElement;
     let input_reference: HTMLInputElement;
 
+    let current_string_answer: Promise<string | null> = Promise.resolve(null);
+
     let history_counter: number = 0;
 
     onMount(() => {
@@ -20,16 +22,20 @@
         history_reference.scrollTo(0, history_reference.scrollHeight);
     });
 
-    async function addToHistory() {
+    async function computeAnswer() {
         var result: string;
 
         try {
             result = await invoke('eval', { expression: current_string });
-            // console.log(result);
         } catch (err) {
             result = err;
-            // console.log(err);
         }
+
+        return result;
+    }
+
+    async function addToHistory() {
+        var result: string = await computeAnswer();
 
         if (result === "") {
             result = " ";
@@ -77,6 +83,14 @@
             current_string = GetPrevExpression(history_counter);
         }
     }
+
+    $: {
+        if (current_string === "") {
+            current_string_answer = Promise.resolve(null);
+        } else {
+            current_string_answer = computeAnswer();
+        }
+    }
 </script>
 
 <div class="screen">
@@ -85,6 +99,11 @@
             <HistoryItem {...item} />
         {/each}
     </div>
+    {#await current_string_answer then value}
+        {#if value !== null}
+        <div>Current Answer: {value}</div> 
+        {/if}
+    {/await}
     <input class="expression-input" type="text" bind:this={input_reference} bind:value={current_string} on:keyup={onKeyPress} />
 </div>
 
